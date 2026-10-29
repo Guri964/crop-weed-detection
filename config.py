@@ -19,7 +19,15 @@ class Config:
     
     WEED_MODEL_DIR = os.path.join(BASE_DIR, 'models', 'weed_detector')
     WEED_MODEL_PATH = os.path.join(WEED_MODEL_DIR, 'best.pt')
-    
+
+    PEST_IMAGE_SIZE = 224
+    PEST_MIN_CONFIDENCE = 0.60
+    PEST_MAX_ENTROPY = 0.60
+    PEST_STABILITY_CHECK = True
+
+    WEED_IMAGE_SIZE = 640
+    WEED_CONFIDENCE_THRESHOLD = 0.25
+
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
     

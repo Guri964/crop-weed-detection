@@ -122,6 +122,10 @@
             background: rgba(25, 135, 84, 0.1);
             color: var(--success);
         }
+        .status-icon.uncertain {
+            background: rgba(180, 83, 9, 0.1);
+            color: #b45309;
+        }
         .status-icon svg { width: 20px; height: 20px; }
 
         .disease-title {
@@ -132,6 +136,9 @@
         }
         .disease-title.healthy {
             color: var(--success);
+        }
+        .disease-title.uncertain {
+            color: #b45309;
         }
         .status-pill {
             display: inline-block;
@@ -148,6 +155,51 @@
         .status-pill.healthy {
             background: rgba(25, 135, 84, 0.1);
             color: var(--success);
+        }
+        .status-pill.uncertain {
+            background: rgba(180, 83, 9, 0.1);
+            color: #b45309;
+        }
+
+        .crop-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .crop-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .confidence-meta {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.6rem;
+        }
+        .confidence-meta strong { color: var(--text-main); }
+
+        .notice-box {
+            margin-top: 1.25rem;
+            padding: 0.9rem 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(180, 83, 9, 0.08);
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .notice-box.neutral {
+            background: var(--gray-50);
+            color: var(--text-muted);
+        }
+        .disclaimer-note {
+            margin-top: 1.25rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
         .detail-text {
@@ -263,28 +315,53 @@
                 </div>
 
                 <div class="glass-card details-panel">
-                    {% set is_healthy = 'healthy' in report.disease_name.lower() %}
+                    {% set status = report.status %}
+                    {% set state_class = 'healthy' if status == 'healthy' else ('uncertain' if status in ['uncertain', 'unsupported'] else '') %}
                     <div class="detail-group">
                         <span class="detail-label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15c6-8 12-8 18 0"/><circle cx="12" cy="9" r="3"/></svg>
                             Detected Classification
                         </span>
                         <div class="status-row">
-                            <div class="status-icon {% if is_healthy %}healthy{% endif %}">
-                                {% if is_healthy %}
+                            <div class="status-icon {{ state_class }}">
+                                {% if status == 'healthy' %}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
-                                {% else %}
+                                {% elif status == 'disease' %}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+                                {% else %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
                                 {% endif %}
                             </div>
                             <div>
-                                <h2 class="disease-title {% if is_healthy %}healthy{% endif %}">
-                                    {{ report.disease_name|replace('_', ' ')|title }}
+                                <h2 class="disease-title {{ state_class }}">
+                                    {% if status == 'disease' %}{{ report.condition }}
+                                    {% elif status == 'healthy' %}Healthy leaf
+                                    {% elif status == 'uncertain' %}Inconclusive
+                                    {% else %}Unsupported image{% endif %}
                                 </h2>
-                                <span class="status-pill {% if is_healthy %}healthy{% endif %}">
-                                    {% if is_healthy %}Healthy{% else %}Attention Needed{% endif %}
+                                <span class="status-pill {{ state_class }}">
+                                    {% if status == 'disease' %}Attention Needed
+                                    {% elif status == 'healthy' %}No Disease Detected
+                                    {% elif status == 'uncertain' %}Needs Better Image
+                                    {% else %}Not Supported{% endif %}
                                 </span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <span class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M12 2c-4 2-6 5-6 9s2 7 6 9M12 2c4 2 6 5 6 9s-2 7-6 9"/></svg>
+                            Crop Identified
+                        </span>
+                        <div class="crop-row">
+                            <span class="crop-name">{{ report.crop if report.crop else 'Not identified' }}</span>
+                        </div>
+                        <div class="confidence-meta">
+                            {% if report.confidence is not none %}
+                            <span>Model confidence: <strong>{{ (report.confidence * 100)|round(1) }}%</strong> ({{ report.confidence_label }})</span>
+                            {% endif %}
+                            <span>Prediction stable across image variations: <strong>{{ 'yes' if report.stable else 'no' }}</strong></span>
                         </div>
                     </div>
 
@@ -299,10 +376,26 @@
                     <div class="detail-group">
                         <span class="detail-label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                            Suggested Treatment &amp; Prevention
+                            Suggested Treatment
                         </span>
                         <p class="detail-text">{{ report.treatment }}</p>
                     </div>
+
+                    <div class="detail-group">
+                        <span class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                            Prevention &amp; Management
+                        </span>
+                        <p class="detail-text">{{ report.prevention }}</p>
+                    </div>
+
+                    {% if report.notice %}
+                    <div class="notice-box {{ '' if status == 'uncertain' else 'neutral' }}">{{ report.notice }}</div>
+                    {% endif %}
+
+                    {% if report.disclaimer %}
+                    <p class="disclaimer-note">{{ report.disclaimer }}</p>
+                    {% endif %}
 
                     <div class="action-bar">
                         <a href="{{ url_for('pest.index') }}" class="btn btn-primary">Scan Another Leaf</a>
@@ -327,17 +420,27 @@
                         <div class="weed-summary-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                         </div>
-                        <p class="detail-text">The AI has evaluated the field topology and marked all detected unwanted vegetation with bounding boxes.</p>
+                        <p class="detail-text">{{ report.summary }}</p>
+                    </div>
+
+                    <div class="confidence-meta" style="justify-content: center;">
+                        <span>Weed plants: <strong>{{ report.weed_count }}</strong></span>
+                        <span>Crop plants: <strong>{{ report.crop_count }}</strong></span>
+                        <span>Confidence threshold: <strong>{{ report.threshold }}</strong></span>
                     </div>
 
                     <div class="weed-image-container">
                         <img src="{{ url_for('api.serve_weed_output', filename=filename) }}" alt="Field Scan with Bounding Boxes" class="weed-image">
                     </div>
 
+                    {% if report.weed_count %}
                     <div class="weed-legend">
                         <span class="weed-legend-swatch"></span>
-                        Bounding box marks detected weed location
+                        Bounding box marks a detected weed; crop plants are left unmarked
                     </div>
+                    {% endif %}
+
+                    <p class="disclaimer-note">{{ report.scope_note }}</p>
 
                     <div class="weed-actions">
                         <a href="{{ url_for('api.serve_weed_output', filename=filename) }}" download="weed_scan_result.jpg" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent), #1d4ed8);">

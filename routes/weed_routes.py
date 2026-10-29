@@ -17,13 +17,13 @@ def index():
             flash(error_msg, "error")
             return redirect(request.url)
             
-        predict_success, output_path, predict_error = predict_weed(filepath)
+        predict_success, report, predict_error = predict_weed(filepath)
         
         if not predict_success:
             flash(f"Prediction failed: {predict_error}", "error")
             return redirect(request.url)
             
-        filename = os.path.basename(output_path)
-        return render_template('result.html', module="weed", filename=filename)
+        filename = os.path.basename(report["output_path"])
+        return render_template('result.html', module="weed", report=report, filename=filename)
         
     return render_template('weed.html')

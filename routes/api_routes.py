@@ -32,14 +32,15 @@ def api_predict_weed():
     if not success:
         return jsonify({"status": "error", "message": error_msg}), 400
         
-    predict_success, output_path, predict_error = predict_weed(filepath)
+    predict_success, report, predict_error = predict_weed(filepath)
     
     if not predict_success:
         return jsonify({"status": "error", "message": predict_error}), 500
         
     return jsonify({
         "status": "success",
-        "annotated_image_file": os.path.basename(output_path)
+        "annotated_image_file": os.path.basename(report["output_path"]),
+        "data": {key: value for key, value in report.items() if key != "output_path"}
     })
 
 @api_bp.route('/uploads/pest/<filename>')

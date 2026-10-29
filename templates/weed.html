@@ -361,14 +361,14 @@
                         What It Outputs
                     </h3>
                     <div class="class-preview">
-                        <span class="class-chip">Bounding Boxes</span>
-                        <span class="class-chip">Weed Locations</span>
+                        <span class="class-chip">Weed-only Boxes</span>
+                        <span class="class-chip">Weed &amp; Crop Counts</span>
                         <span class="class-chip">Downloadable Result</span>
                     </div>
                 </div>
 
                 <div class="model-note">
-                    <strong>How it works:</strong> your field image is passed through a YOLOv8 object detection model trained to locate unwanted vegetation, returning an annotated image with a bounding box around every detected weed.
+                    <strong>How it works:</strong> your field image is passed through a YOLOv8 detector with two classes, crop and weed. Only weed detections above the confidence threshold are drawn, so crop plants are never boxed. A single image is not a field-wide survey.
                 </div>
             </div>
         </div>

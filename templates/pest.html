@@ -350,17 +350,26 @@
                         What It Detects
                     </h3>
                     <div class="class-preview">
-                        <span class="class-chip">Leaf Spot</span>
-                        <span class="class-chip">Blight</span>
-                        <span class="class-chip">Insect Damage</span>
-                        <span class="class-chip">Nutrient Stress</span>
-                        <span class="class-chip">Fungal Growth</span>
-                        <span class="class-chip">+ more</span>
+                        <span class="class-chip">Apple</span>
+                        <span class="class-chip">Blueberry</span>
+                        <span class="class-chip">Cherry</span>
+                        <span class="class-chip">Corn</span>
+                        <span class="class-chip">Grape</span>
+                        <span class="class-chip">Orange</span>
+                        <span class="class-chip">Peach</span>
+                        <span class="class-chip">Bell pepper</span>
+                        <span class="class-chip">Potato</span>
+                        <span class="class-chip">Raspberry</span>
+                        <span class="class-chip">Soybean</span>
+                        <span class="class-chip">Squash</span>
+                        <span class="class-chip">Strawberry</span>
+                        <span class="class-chip">Tomato</span>
                     </div>
+                    <p class="model-note" style="margin-top: 1rem;">Crops outside this list cannot be identified by the current model.</p>
                 </div>
 
                 <div class="model-note">
-                    <strong>How it works:</strong> your image is converted from RGB to HSV color space, then passed through a customized MobileNetV2 network trained to recognize 15 pest, disease, and stress classes.
+                    <strong>How it works:</strong> your image is converted from BGR to HSV colour space, then passed through a customized MobileNetV2 network trained on 38 PlantVillage classes covering 14 crop species (26 diseases plus healthy leaves). Predictions are only reported when the model is confident and stable; otherwise the result is marked inconclusive.
                 </div>
             </div>
         </div>
