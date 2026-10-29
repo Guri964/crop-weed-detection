@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --leaf-50: #eef7ec;
+            --leaf-100: #dcefd9;
+        }
+
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 3.5rem 1.5rem;
+            background: radial-gradient(circle at top right, var(--leaf-100), transparent 60%),
+                        radial-gradient(circle at bottom left, rgba(13, 202, 240, 0.08), transparent 55%);
+        }
+
+        .auth-shell {
+            width: 100%;
+            max-width: 980px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Left benefits panel */
+        .auth-visual {
+            background: linear-gradient(160deg, var(--primary-dark), var(--primary));
+            color: var(--white);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .auth-visual-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.15);
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            margin-bottom: 1.5rem;
+            width: fit-content;
+        }
+        .auth-visual h3 {
+            font-size: 1.6rem;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+        }
+        .auth-visual > p {
+            opacity: 0.88;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .visual-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+        .visual-benefit {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .visual-benefit-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .visual-benefit-icon svg { width: 14px; height: 14px; }
+        .visual-benefit span {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0.92;
+        }
+
+        /* Right form panel */
+        .auth-card {
+            background: var(--white);
+            padding: 3rem 2.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .auth-header {
+            margin-bottom: 2rem;
+        }
+        .auth-header h2 {
+            color: var(--primary-dark);
+            font-size: 1.85rem;
+            margin-bottom: 0.4rem;
+        }
+        .auth-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.92rem;
+        }
+        .input-wrap {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            display: flex;
+            pointer-events: none;
+        }
+        .input-icon svg { width: 18px; height: 18px; }
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.6rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+            background: var(--white);
+        }
+        .toggle-visibility {
+            position: absolute;
+            right: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0.25rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            line-height: 0;
+        }
+        .toggle-visibility:hover { color: var(--primary-dark); }
+        .toggle-visibility svg { width: 18px; height: 18px; }
+
+        .strength-meter {
+            height: 4px;
+            background: #e5e7eb;
+            margin-top: 0.6rem;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .strength-meter-fill {
+            height: 100%;
+            width: 0;
+            transition: var(--transition);
+        }
+        .strength-text {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+            text-align: right;
+            display: block;
+        }
+
+        .btn-full {
+            width: 100%;
+            font-size: 1.05rem;
+            margin-top: 0.5rem;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.75rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+        .auth-footer a {
+            font-weight: 700;
+        }
+        .error-text {
+            color: var(--danger);
+            font-size: 0.82rem;
+            margin-top: 0.35rem;
+            display: none;
+        }
+
+        @media (max-width: 860px) {
+            .auth-shell { grid-template-columns: 1fr; max-width: 480px; }
+            .auth-visual { display: none; }
+            .auth-card { padding: 2.5rem 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="auth-container">
+        <div class="auth-shell fade-in">
+            <div class="auth-visual">
+                <span class="auth-visual-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2v20M12 2c-4 2-6 5-6 9s2 7 6 9M12 2c4 2 6 5 6 9s-2 7-6 9"/></svg>
+                    CropRisk AI
+                </span>
+                <h3>Join the AI-powered agriculture platform</h3>
+                <p>Create a free account to run instant leaf diagnostics and field-scale weed scans.</p>
+                <div class="visual-benefits">
+                    <div class="visual-benefit">
+                        <span class="visual-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                        <span>Instant pest and disease detection with MobileNetV2</span>
+                    </div>
+                    <div class="visual-benefit">
+                        <span class="visual-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                        <span>Field-wide weed mapping with YOLOv8</span>
+                    </div>
+                    <div class="visual-benefit">
+                        <span class="visual-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                        <span>Clear treatment and prevention guidance</span>
+                    </div>
+                    <div class="visual-benefit">
+                        <span class="visual-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                        <span>Free to use, no installs required</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Create Account</h2>
+                    <p>Join the AI-powered agriculture platform</p>
+                </div>
+
+                <form action="{{ url_for('auth.signup') }}" method="POST" id="signupForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Choose a unique username" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Create a strong password" required>
+                            <button type="button" class="toggle-visibility" data-target="password" aria-label="Show password">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <div class="strength-meter">
+                            <div class="strength-meter-fill" id="strengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="strengthText">Password Strength</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </span>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat your password" required>
+                            <button type="button" class="toggle-visibility" data-target="confirm_password" aria-label="Show password">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <span class="error-text" id="passwordMatchError">Passwords do not match</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="signupBtn">Create Account</button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.querySelectorAll('.toggle-visibility').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var input = document.getElementById(btn.getAttribute('data-target'));
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+    </script>
+</body>
+</html>

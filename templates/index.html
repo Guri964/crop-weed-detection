@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --leaf-50: #eef7ec;
+            --leaf-100: #dcefd9;
+            --beige-50: #f7f3e9;
+            --gray-50: #f5f5f3;
+            --radius-lg: 20px;
+        }
+
+        /* Hero */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--leaf-50) 0%, var(--white) 75%);
+            padding: 4rem 0 5rem;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .hero-copy { text-align: left; }
+        .hero-title { text-align: left; }
+        .hero-subtitle { text-align: left; margin-left: 0; }
+        .hero-actions { display: flex; gap: 1rem; justify-content: flex-start; margin-top: 2rem; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            margin-bottom: 1.25rem;
+        }
+        .hero-badge svg { width: 14px; height: 14px; }
+        .hero-illustration { width: 100%; height: auto; }
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .hero-stat-num { font-size: 1.6rem; font-weight: 700; color: var(--primary-dark); }
+        .hero-stat-label { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* Section shell */
+        .section { padding: 5rem 0; }
+        .section-alt { background: var(--gray-50); }
+        .section-head { max-width: 640px; margin: 0 auto 3rem; text-align: center; }
+        .section-eyebrow {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .section-title { font-size: 2rem; color: var(--primary-dark); margin-bottom: 0.75rem; }
+        .section-desc { color: var(--text-muted); line-height: 1.7; }
+
+        /* Feature icon cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.75rem;
+        }
+        .feature-card {
+            padding: 2rem 1.75rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+        .feature-icon svg { width: 22px; height: 22px; }
+        .feature-card h4 { color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.05rem; }
+        .feature-card p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+
+        /* Modules (reuses glass-card) */
+        .module-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        .module-badge.pest { background: var(--leaf-100); color: var(--primary-dark); }
+        .module-badge.weed { background: #dbeafe; color: #1d4ed8; }
+
+        /* Workflow */
+        .workflow-track {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            position: relative;
+        }
+        .workflow-step { text-align: center; padding: 0 0.5rem; }
+        .workflow-num {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            background: var(--primary-dark);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .workflow-step h4 { color: var(--text-main); margin-bottom: 0.5rem; font-size: 1rem; }
+        .workflow-step p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+
+        /* Tech stack */
+        .tech-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .tech-chip {
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.08);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.3rem;
+            border-radius: 999px;
+        }
+
+        /* Why choose us */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .why-item { display: flex; gap: 1rem; align-items: flex-start; }
+        .why-check {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .why-check svg { width: 16px; height: 16px; }
+        .why-item h4 { color: var(--text-main); font-size: 1rem; margin-bottom: 0.3rem; }
+        .why-item p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border-radius: var(--radius-lg);
+            padding: 3.5rem 2.5rem;
+            text-align: center;
+            color: var(--white);
+        }
+        .cta-section h2 { font-size: 1.8rem; margin-bottom: 0.75rem; }
+        .cta-section p { opacity: 0.9; margin-bottom: 1.75rem; }
+        .cta-section .btn-primary {
+            background: var(--white);
+            color: var(--primary-dark);
+        }
+
+        footer.site-footer {
+            padding: 2.5rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            background: var(--gray-50);
+        }
+        footer.site-footer .footer-tagline {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 860px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-copy { text-align: center; }
+            .hero-title, .hero-subtitle { text-align: center; }
+            .hero-actions { justify-content: center; }
+            .hero-stats { justify-content: center; flex-wrap: wrap; }
+            .hero-illustration { max-width: 380px; margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                {% if g.user %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Dashboard</a>
+                    <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <section class="hero-section fade-in">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-copy">
+                        <span class="hero-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M12 2c-4 2-6 5-6 9s2 7 6 9M12 2c4 2 6 5 6 9s-2 7-6 9"/></svg>
+                            AI for Precision Agriculture
+                        </span>
+                        <h1 class="hero-title">Hybrid Remote Sensing<br>Crop Risk Evaluation</h1>
+                        <p class="hero-subtitle">
+                            Empowering farmers with advanced Artificial Intelligence. Detect crop pests and identify field weeds instantly using our MobileNetV2 and YOLOv8 integrated platforms.
+                        </p>
+                        <div class="hero-actions">
+                            {% if g.user %}
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                            {% else %}
+                                <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Get Started</a>
+                                <a href="#features" class="btn btn-outline">Learn More</a>
+                            {% endif %}
+                        </div>
+                        <div class="hero-stats">
+                            <div>
+                                <div class="hero-stat-num">15+</div>
+                                <div class="hero-stat-label">Disease &amp; Pest Classes</div>
+                            </div>
+                            <div>
+                                <div class="hero-stat-num">2</div>
+                                <div class="hero-stat-label">AI Detection Modules</div>
+                            </div>
+                            <div>
+                                <div class="hero-stat-num">Real-Time</div>
+                                <div class="hero-stat-label">Field Analysis</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <svg class="hero-illustration" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="240" cy="380" rx="200" ry="24" fill="#dcefd9"/>
+                            <path d="M60 340 C60 200 150 140 240 140 C330 140 420 200 420 340 Z" fill="#eef7ec" stroke="#c7e6c2" stroke-width="2"/>
+                            <path d="M110 340 L130 220 M170 340 L185 200 M240 340 L240 190 M300 340 L295 200 M355 340 L340 220" stroke="#8fc98a" stroke-width="6" stroke-linecap="round" fill="none"/>
+                            <circle cx="130" cy="205" r="16" fill="#4c9a5f"/>
+                            <circle cx="185" cy="185" r="18" fill="#3f8a52"/>
+                            <circle cx="240" cy="175" r="20" fill="#4c9a5f"/>
+                            <circle cx="295" cy="185" r="18" fill="#3f8a52"/>
+                            <circle cx="340" cy="205" r="16" fill="#4c9a5f"/>
+                            <rect x="200" y="60" width="80" height="52" rx="10" fill="#ffffff" stroke="#1d4ed8" stroke-width="2"/>
+                            <circle cx="240" cy="86" r="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+                            <path d="M240 30 L240 60 M215 45 L200 30 M265 45 L280 30" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="200" cy="30" r="4" fill="#1d4ed8"/>
+                            <circle cx="280" cy="30" r="4" fill="#1d4ed8"/>
+                            <path d="M240 112 Q235 150 245 175" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="4 5" fill="none"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="section-eyebrow">The Project</span>
+                    <h2 class="section-title">One Platform, Two Ways to Protect Your Yield</h2>
+                    <p class="section-desc">
+                        CropRisk AI combines leaf-level diagnostics with field-scale imaging so you can catch problems early, understand the cause, and act before losses spread.
+                    </p>
+                </div>
+                <div class="feature-grid fade-in">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15c6-8 12-8 18 0"/><circle cx="12" cy="9" r="3"/></svg>
+                        </div>
+                        <h4>Instant Diagnosis</h4>
+                        <p>Upload a leaf photo and get a disease or pest reading in seconds, no lab equipment needed.</p>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>
+                        </div>
+                        <h4>Field-Scale Coverage</h4>
+                        <p>Scan full drone or overhead field images to locate weeds across every row, not just a sample.</p>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                        </div>
+                        <h4>Root Cause Analysis</h4>
+                        <p>Every result explains what is likely causing the issue, not just a label with no context.</p>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <h4>Actionable Treatment</h4>
+                        <p>Get clear, practical treatment and prevention guidance you can apply the same day.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section section-alt">
+            <div class="container">
+                <div class="section-head">
+                    <span class="section-eyebrow">AI Modules</span>
+                    <h2 class="section-title">Two Models, Purpose-Built for the Field</h2>
+                    <p class="section-desc">
+                        Each module is trained and tuned for a specific job, from close-up leaf analysis to wide-angle field scanning.
+                    </p>
+                </div>
+                <div class="features-grid fade-in">
+                    <div class="glass-card">
+                        <span class="module-badge pest">Module 1</span>
+                        <h3 style="color: var(--primary-dark);">Pest &amp; Stress Detection</h3>
+                        <p class="mb-4 text-muted">
+                            Upload a close-up image of a plant leaf. Our system converts the image from RGB to HSV and processes it through a customized MobileNetV2 architecture.
+                        </p>
+                        <ul style="list-style-position: inside; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            <li>Identifies 15 disease and pest classes</li>
+                            <li>Provides root cause analysis</li>
+                            <li>Suggests treatment and prevention</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card">
+                        <span class="module-badge weed">Module 2</span>
+                        <h3 style="color: var(--accent);">Weed Detection</h3>
+                        <p class="mb-4 text-muted">
+                            Upload an aerial or overhead image of your crop field. Our YOLOv8 model evaluates the remote sensing data to pinpoint unwanted vegetation.
+                        </p>
+                        <ul style="list-style-position: inside; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            <li>Processes full field imagery</li>
+                            <li>Generates precise bounding boxes</li>
+                            <li>Highlights exact weed locations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="section-eyebrow">Workflow</span>
+                    <h2 class="section-title">From Upload to Action in Four Steps</h2>
+                </div>
+                <div class="workflow-track fade-in">
+                    <div class="workflow-step">
+                        <div class="workflow-num">1</div>
+                        <h4>Upload an Image</h4>
+                        <p>Choose a leaf close-up or an overhead field photo depending on the module.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-num">2</div>
+                        <h4>AI Processing</h4>
+                        <p>MobileNetV2 or YOLOv8 analyzes the image and runs inference in real time.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-num">3</div>
+                        <h4>Review Results</h4>
+                        <p>See the prediction, confidence score, and, where relevant, cause of the issue.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="workflow-num">4</div>
+                        <h4>Take Action</h4>
+                        <p>Apply the suggested treatment or mark the weed locations for removal.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-alt">
+            <div class="container">
+                <div class="section-head">
+                    <span class="section-eyebrow">Technology</span>
+                    <h2 class="section-title">Built on Proven AI Foundations</h2>
+                </div>
+                <div class="tech-row fade-in">
+                    <span class="tech-chip">MobileNetV2</span>
+                    <span class="tech-chip">YOLOv8</span>
+                    <span class="tech-chip">Flask</span>
+                    <span class="tech-chip">Python</span>
+                    <span class="tech-chip">OpenCV</span>
+                    <span class="tech-chip">HSV Color Space</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="section-eyebrow">Why Choose Us</span>
+                    <h2 class="section-title">Practical AI, Built for Real Fields</h2>
+                </div>
+                <div class="why-grid fade-in">
+                    <div class="why-item">
+                        <div class="why-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+                        <div>
+                            <h4>Trained on Real Crop Data</h4>
+                            <p>Models tuned specifically for common leaf diseases and field weed patterns.</p>
+                        </div>
+                    </div>
+                    <div class="why-item">
+                        <div class="why-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+                        <div>
+                            <h4>Fast, In-Browser Results</h4>
+                            <p>No installs or specialist hardware. Upload a photo and get a reading right away.</p>
+                        </div>
+                    </div>
+                    <div class="why-item">
+                        <div class="why-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+                        <div>
+                            <h4>Clear, Usable Guidance</h4>
+                            <p>Every result comes with plain-language explanations, not just raw numbers.</p>
+                        </div>
+                    </div>
+                    <div class="why-item">
+                        <div class="why-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+                        <div>
+                            <h4>Built for the Whole Field</h4>
+                            <p>Covers both individual plant health and field-wide weed pressure in one platform.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="cta-section fade-in">
+                    <h2>Start Evaluating Your Crop Risk Today</h2>
+                    <p>Create a free account and run your first pest or weed scan in minutes.</p>
+                    {% if g.user %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Get Started</a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container text-muted">
+            <p class="footer-tagline">CropRisk AI &mdash; Hybrid Remote Sensing for Crop Risk Evaluation</p>
+            <p>&copy; 2026 Crop Risk Evaluation AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

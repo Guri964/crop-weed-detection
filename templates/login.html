@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .auth-container {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 3rem 1.5rem;
+            background: radial-gradient(circle at top left, var(--primary-light), transparent),
+                        radial-gradient(circle at bottom right, rgba(13, 202, 240, 0.1), transparent);
+        }
+        .auth-shell {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: stretch;
+            background: #fff;
+            border-radius: var(--radius-lg, 20px);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .auth-brand {
+            background: linear-gradient(160deg, var(--primary-dark), var(--primary));
+            color: var(--white);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow:hidden;
+        }
+        .auth-brand h3{
+            font-size:2rem;
+            line-height:1.35;
+            margin-bottom:1rem;
+            color:#fff;
+            word-break:break-word;
+        }
+        .auth-brand p {
+            opacity: 0.9;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+        .auth-brand-illustration {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 2rem;
+        }
+        .auth-brand-stats {
+            display: flex;
+            gap: 1.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .auth-brand-stat-num { font-size: 1.3rem; font-weight: 700; }
+        .auth-brand-stat-label { font-size: 0.75rem; opacity: 0.85; }
+
+        .auth-card{
+            width:100%;
+            padding:3rem;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            background:#fff;
+            min-width:0;
+        }
+        .auth-header {
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        .auth-header h2 {
+            color: var(--primary-dark);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .auth-header p {
+            color: var(--text-muted);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .input-icon-wrapper {
+            position: relative;
+        }
+        .input-icon-wrapper svg {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .input-icon-wrapper .form-control {
+            padding-left: 2.75rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
+            background: var(--white);
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper .form-control {
+            padding-right: 3.25rem;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0;
+        }
+        .toggle-password:hover {
+            color: var(--primary-dark);
+        }
+        .auth-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .btn-full {
+            width: 100%;
+            font-size: 1.1rem;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .auth-footer a {
+            font-weight: 700;
+        }
+
+        @media(max-width:992px){
+            .auth-shell{
+                grid-template-columns:1fr;
+            }
+
+            .auth-brand{
+                display:none;
+            }
+
+            .auth-card{
+                padding:2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                <a href="{{ url_for('auth.signup') }}" class="btn btn-outline">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="auth-container">
+        <div class="auth-shell fade-in">
+            <div class="auth-brand">
+                <svg class="auth-brand-illustration" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="110" cy="160" rx="95" ry="14" fill="rgba(255,255,255,0.12)"/>
+                    <path d="M30 140 C30 70 65 40 110 40 C155 40 190 70 190 140 Z" fill="rgba(255,255,255,0.08)"/>
+                    <path d="M55 140 L65 85 M90 140 L96 70 M120 140 L120 65 M150 140 L146 80 M175 140 L166 90" stroke="rgba(255,255,255,0.55)" stroke-width="5" stroke-linecap="round" fill="none"/>
+                    <circle cx="65" cy="80" r="12" fill="rgba(255,255,255,0.85)"/>
+                    <circle cx="96" cy="63" r="14" fill="rgba(255,255,255,0.95)"/>
+                    <circle cx="120" cy="58" r="15" fill="rgba(255,255,255,0.85)"/>
+                    <circle cx="146" cy="73" r="13" fill="rgba(255,255,255,0.95)"/>
+                    <circle cx="166" cy="85" r="12" fill="rgba(255,255,255,0.85)"/>
+                </svg>
+                <h3>
+    Know your field's risk<br>
+    before it spreads.
+</h3>
+                <p>Sign in to run pest and weed scans on your crops with our MobileNetV2 and YOLOv8 AI modules.</p>
+                <div class="auth-brand-stats">
+                    <div>
+                        <div class="auth-brand-stat-num">38</div>
+                        <div class="auth-brand-stat-label">Disease Classes</div>
+                    </div>
+                    <div>
+                        <div class="auth-brand-stat-num">2</div>
+                        <div class="auth-brand-stat-label">AI Modules</div>
+                    </div>
+                    <div>
+                        <div class="auth-brand-stat-num">Real-Time</div>
+                        <div class="auth-brand-stat-label">Results</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Login to access your dashboard</p>
+                </div>
+
+                <form action="{{ url_for('auth.login') }}" method="POST" id="loginForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-icon-wrapper password-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Show</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-options">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Login to Dashboard</button>
+                </form>
+
+                <div class="auth-footer">
+                    Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign up here</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+    </script>
+</body>
+</html>

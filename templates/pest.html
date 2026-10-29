@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pest Detection - Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --leaf-50: #eef7ec;
+            --leaf-100: #dcefd9;
+            --gray-50: #f5f5f3;
+        }
+
+        .module-page {
+            padding: 3.5rem 0 5rem;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .module-header {
+            margin-bottom: 2rem;
+        }
+        .module-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        .module-badge svg { width: 14px; height: 14px; }
+        .module-header h1 {
+            color: var(--primary-dark);
+            font-size: 1.9rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+        }
+        .module-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 520px;
+            line-height: 1.6;
+        }
+
+        /* Upload card */
+        .upload-card {
+            padding: 2.25rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            background: var(--leaf-50);
+            position: relative;
+            overflow: hidden;
+        }
+        .upload-zone:hover,
+        .upload-zone.drag-active {
+            border-color: var(--primary);
+            background: rgba(25, 135, 84, 0.06);
+        }
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            box-shadow: 0 8px 20px rgba(25, 135, 84, 0.25);
+        }
+        .upload-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .upload-text {
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+        .upload-subtext {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+        .upload-formats {
+            display: inline-flex;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+        }
+        .format-chip {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+        }
+
+        #previewContainer {
+            position: relative;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: var(--radius-md);
+            object-fit: contain;
+            box-shadow: var(--shadow-sm);
+        }
+        .remove-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-area {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .btn-predict {
+            min-width: 240px;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .btn-predict:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sidebar */
+        .side-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .info-card {
+            padding: 1.75rem;
+        }
+        .info-card h3 {
+            font-size: 1rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-card h3 svg { width: 18px; height: 18px; }
+
+        .tip-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .tip-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .tip-check {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+        .tip-check svg { width: 12px; height: 12px; }
+
+        .class-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .class-chip {
+            font-size: 0.78rem;
+            color: var(--primary-dark);
+            background: var(--leaf-50);
+            border: 1px solid var(--leaf-100);
+            padding: 0.3rem 0.65rem;
+            border-radius: 999px;
+        }
+
+        .model-note {
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .model-note strong { color: var(--text-main); }
+
+        @media (max-width: 900px) {
+            .module-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="container module-page">
+        <div class="module-header fade-in">
+            <span class="module-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15c6-8 12-8 18 0"/><circle cx="12" cy="9" r="3"/></svg>
+                Module 1
+            </span>
+            <h1>Pest &amp; Stress Detection</h1>
+            <p>Upload a clear, close-up image of a plant leaf. Our MobileNetV2 model analyzes it in HSV color space to identify pest damage, disease, or nutrient stress.</p>
+        </div>
+
+        <div class="module-grid">
+            <div class="glass-card upload-card fade-in">
+                <form action="{{ url_for('pest.index') }}" method="POST" enctype="multipart/form-data" id="predictionForm">
+                    <div class="upload-zone" id="dropZone">
+                        <input type="file" name="file" id="imageUpload" accept=".jpg, .jpeg, .png" style="display: none;" required>
+
+                        <div id="uploadPrompt">
+                            <div class="upload-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <p class="upload-text">Drag and drop your leaf image here</p>
+                            <p class="upload-subtext">or click to browse from your device</p>
+                            <div class="upload-formats">
+                                <span class="format-chip">JPG</span>
+                                <span class="format-chip">JPEG</span>
+                                <span class="format-chip">PNG</span>
+                            </div>
+                        </div>
+
+                        <div id="previewContainer" style="display: none;">
+                            <img id="imagePreview" src="" alt="Uploaded Leaf Image">
+                            <button type="button" class="btn btn-outline remove-btn" onclick="removeImage(event)">Remove Image</button>
+                        </div>
+                    </div>
+
+                    <div class="action-area">
+                        <button type="submit" class="btn btn-primary btn-predict" id="predictBtn" disabled>
+                            <span class="loader" id="btnLoader" style="display: none;"></span>
+                            <span id="btnText">Analyze Plant Leaf</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="side-stack fade-in">
+                <div class="glass-card info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                        For Best Results
+                    </h3>
+                    <ul class="tip-list">
+                        <li>
+                            <span class="tip-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                            Take the photo in natural daylight, avoiding harsh shadows.
+                        </li>
+                        <li>
+                            <span class="tip-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                            Fill the frame with a single leaf, held flat and in focus.
+                        </li>
+                        <li>
+                            <span class="tip-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                            Include any visible spots, discoloration, or damage clearly.
+                        </li>
+                        <li>
+                            <span class="tip-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                            Use a plain background where possible for cleaner results.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card info-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>
+                        What It Detects
+                    </h3>
+                    <div class="class-preview">
+                        <span class="class-chip">Leaf Spot</span>
+                        <span class="class-chip">Blight</span>
+                        <span class="class-chip">Insect Damage</span>
+                        <span class="class-chip">Nutrient Stress</span>
+                        <span class="class-chip">Fungal Growth</span>
+                        <span class="class-chip">+ more</span>
+                    </div>
+                </div>
+
+                <div class="model-note">
+                    <strong>How it works:</strong> your image is converted from RGB to HSV color space, then passed through a customized MobileNetV2 network trained to recognize 15 pest, disease, and stress classes.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

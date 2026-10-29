@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .dashboard-header {
+            padding: 3rem 0 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .welcome-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .welcome-eyebrow svg { width: 14px; height: 14px; }
+        .welcome-text {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        .dashboard-summary {
+            display: flex;
+            gap: 2rem;
+        }
+        .summary-stat { text-align: right; }
+        .summary-num { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
+        .summary-label { font-size: 0.8rem; color: var(--text-muted); }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+        .module-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .module-card:hover {
+            transform: translateY(-6px);
+        }
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+        .module-icon svg { width: 28px; height: 28px; }
+        .icon-pest {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        .icon-weed {
+            background: linear-gradient(135deg, var(--accent), #1d4ed8);
+        }
+        .module-content {
+            flex-grow: 1;
+        }
+        .module-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .module-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+        .module-desc {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .module-footer {
+            margin-top: auto;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 1.5rem;
+        }
+        .btn-module {
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-header { flex-direction: column; align-items: flex-start; }
+            .dashboard-summary { justify-content: flex-start; }
+            .summary-stat { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                <span style="font-weight: 600; color: var(--text-muted);">{{ g.user['username'] }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="container">
+        <header class="dashboard-header fade-in">
+            <div>
+                <span class="welcome-eyebrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M12 2c-4 2-6 5-6 9s2 7 6 9M12 2c4 2 6 5 6 9s-2 7-6 9"/></svg>
+                    Dashboard
+                </span>
+                <h1 class="welcome-text">Welcome back, {{ g.user['username'] }}</h1>
+                <p class="text-muted">Select an AI module to begin your crop evaluation.</p>
+            </div>
+            <div class="dashboard-summary">
+                <div class="summary-stat">
+                    <div class="summary-num">2</div>
+                    <div class="summary-label">AI Modules</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-num">15+</div>
+                    <div class="summary-label">Detectable Classes</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="module-grid fade-in">
+            <div class="glass-card module-card">
+                <div class="module-icon icon-pest">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15c6-8 12-8 18 0"/><circle cx="12" cy="9" r="3"/></svg>
+                </div>
+                <div class="module-content">
+                    <span class="module-tag">Module 1</span>
+                    <h2 class="module-title">Pest &amp; Stress Detection</h2>
+                    <p class="module-desc">
+                        Upload a close-up image of a plant leaf. The MobileNetV2 model will evaluate the RGB-to-HSV converted image to identify diseases, provide root cause analysis, and suggest targeted treatments.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <a href="{{ url_for('pest.index') }}" class="btn btn-primary btn-module">Launch Pest Detection</a>
+                </div>
+            </div>
+
+            <div class="glass-card module-card">
+                <div class="module-icon icon-weed">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>
+                </div>
+                <div class="module-content">
+                    <span class="module-tag">Module 2</span>
+                    <h2 class="module-title">Field Weed Detection</h2>
+                    <p class="module-desc">
+                        Upload an overhead drone or field image. The YOLOv8 model will scan the terrain and generate precise bounding boxes to highlight the exact locations of unwanted vegetation.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <a href="{{ url_for('weed.index') }}" class="btn btn-primary btn-module" style="background: linear-gradient(135deg, var(--accent), #1d4ed8); box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);">Launch Weed Detection</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

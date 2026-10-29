@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result - Crop Risk Evaluation AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --leaf-50: #eef7ec;
+            --leaf-100: #dcefd9;
+            --gray-50: #f5f5f3;
+        }
+
+        .result-container {
+            flex-grow: 1;
+            padding: 3.5rem 1.5rem 5rem;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .result-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            background: var(--leaf-100);
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        .result-eyebrow.accent {
+            background: #dbeafe;
+            color: var(--accent);
+        }
+        .result-eyebrow svg { width: 14px; height: 14px; }
+        .result-header h1 {
+            color: var(--primary-dark);
+            font-size: 2rem;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Pest Module Layout */
+        .pest-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 2.5rem;
+            max-width: 1040px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .pest-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .image-panel {
+            background: var(--leaf-50);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 1.5rem;
+        }
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .details-panel {
+            padding: 2.25rem;
+        }
+        .detail-group {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .detail-group:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+        }
+        .detail-label svg { width: 14px; height: 14px; }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .status-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger);
+        }
+        .status-icon.healthy {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--success);
+        }
+        .status-icon svg { width: 20px; height: 20px; }
+
+        .disease-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--danger);
+            line-height: 1.25;
+        }
+        .disease-title.healthy {
+            color: var(--success);
+        }
+        .status-pill {
+            display: inline-block;
+            margin-top: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger);
+        }
+        .status-pill.healthy {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--success);
+        }
+
+        .detail-text {
+            font-size: 1rem;
+            color: var(--text-main);
+            line-height: 1.7;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Weed Module Layout */
+        .weed-layout {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .weed-summary-card {
+            padding: 2.25rem;
+        }
+        .weed-summary-text {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: center;
+            text-align: left;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+        .weed-summary-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .weed-summary-icon svg { width: 20px; height: 20px; }
+
+        .weed-image-container {
+            margin: 2.25rem 0;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .weed-image {
+            max-width: 100%;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .weed-legend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: -1rem;
+            margin-bottom: 2rem;
+        }
+        .weed-legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 2px solid var(--accent);
+            background: rgba(29, 78, 216, 0.08);
+        }
+
+        .weed-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="nav-brand">CropRisk AI</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="result-container fade-in">
+        <div class="container">
+
+            {% if module == 'pest' %}
+            <div class="result-header">
+                <span class="result-eyebrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Analysis Complete
+                </span>
+                <h1>Diagnostic Report</h1>
+                <p class="text-muted">MobileNetV2 plant leaf analysis</p>
+            </div>
+
+            <div class="pest-grid">
+                <div class="image-panel">
+                    <img src="{{ url_for('api.serve_pest_upload', filename=filename) }}" alt="Analyzed Leaf" class="result-image">
+                </div>
+
+                <div class="glass-card details-panel">
+                    {% set is_healthy = 'healthy' in report.disease_name.lower() %}
+                    <div class="detail-group">
+                        <span class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15c6-8 12-8 18 0"/><circle cx="12" cy="9" r="3"/></svg>
+                            Detected Classification
+                        </span>
+                        <div class="status-row">
+                            <div class="status-icon {% if is_healthy %}healthy{% endif %}">
+                                {% if is_healthy %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                                {% else %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h2 class="disease-title {% if is_healthy %}healthy{% endif %}">
+                                    {{ report.disease_name|replace('_', ' ')|title }}
+                                </h2>
+                                <span class="status-pill {% if is_healthy %}healthy{% endif %}">
+                                    {% if is_healthy %}Healthy{% else %}Attention Needed{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <span class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                            Root Cause Analysis
+                        </span>
+                        <p class="detail-text">{{ report.root_cause }}</p>
+                    </div>
+
+                    <div class="detail-group">
+                        <span class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            Suggested Treatment &amp; Prevention
+                        </span>
+                        <p class="detail-text">{{ report.treatment }}</p>
+                    </div>
+
+                    <div class="action-bar">
+                        <a href="{{ url_for('pest.index') }}" class="btn btn-primary">Scan Another Leaf</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            {% elif module == 'weed' %}
+            <div class="weed-layout">
+                <div class="result-header">
+                    <span class="result-eyebrow accent">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/></svg>
+                        Scan Complete
+                    </span>
+                    <h1 style="color: var(--accent);">Field Scan Complete</h1>
+                    <p class="text-muted">YOLOv8 bounding box generation</p>
+                </div>
+
+                <div class="glass-card weed-summary-card">
+                    <div class="weed-summary-text">
+                        <div class="weed-summary-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                        </div>
+                        <p class="detail-text">The AI has evaluated the field topology and marked all detected unwanted vegetation with bounding boxes.</p>
+                    </div>
+
+                    <div class="weed-image-container">
+                        <img src="{{ url_for('api.serve_weed_output', filename=filename) }}" alt="Field Scan with Bounding Boxes" class="weed-image">
+                    </div>
+
+                    <div class="weed-legend">
+                        <span class="weed-legend-swatch"></span>
+                        Bounding box marks detected weed location
+                    </div>
+
+                    <div class="weed-actions">
+                        <a href="{{ url_for('api.serve_weed_output', filename=filename) }}" download="weed_scan_result.jpg" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent), #1d4ed8);">
+                            Download Image
+                        </a>
+                        <a href="{{ url_for('weed.index') }}" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);">Scan Another Field</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+
+</body>
+</html>

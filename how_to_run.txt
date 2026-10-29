@@ -1,0 +1,29 @@
+Step 1 Install Python version
+
+install Python 3.11.0 only
+if you have any other Python versions installed, uninstall them first.
+If you're unsure how to uninstall/install Python then please refer to youtube tutorials.
+
+Step 2 Verify python installation
+
+Open terminal and run "python --version" if the output is python 3.11.0 you are good to good
+
+Step 3 Download the project
+
+Download the project source code and extract the ZIP file
+Open the project folder in VS Code
+
+Step 4 Create a Virtual Environment
+
+Open the terminal inside the project folder and run "py -3.11 -m venv .venv"
+wait a few seconds until the virtual environment is created.
+
+Step 5 Activate the Virtual Environment
+
+run ".\.venv\Scripts\Activate.ps1" after activation you will see .venv at beginning of terminal
+
+Step 6 Install Dependencies
+
+run "pip install -r requirements_updated.txt"
+
+now simpily run the application by running "python app.py"
