@@ -5,7 +5,16 @@ All endpoints accept `multipart/form-data` uploads in the `file` field
 
 ## POST /api/pest/predict
 
-Leaf image classification with the MobileNetV2 model (38 PlantVillage classes, 14 crops).
+Leaf image classification. Internally the request may be answered by the primary 38-class model
+or, when the primary result is not accepted, by the secondary 15-class model. The response format
+is identical either way; the client never sees which model produced the answer.
+
+Primary model: MobileNetV2, 38 PlantVillage classes across 14 crops, HSV preprocessing.
+Secondary model: EfficientNet-B3, 15 pepper/potato/tomato classes, RGB preprocessing, only used
+when the primary model rejects the image and the primary model independently corroborates the
+crop family. Acceptance thresholds are configured separately (`FALLBACK_*` in `config.py`).
+Diagnostics (both models' classes, confidences, entropies, eligibility mass and the rejection
+reason) are written to the server log by `services.pest_service`, never to the response.
 
 ```json
 {

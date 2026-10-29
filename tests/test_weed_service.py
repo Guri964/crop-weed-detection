@@ -103,7 +103,7 @@ def test_annotation_draws_only_supplied_weed_boxes():
     assert annotated.shape == image.shape
     assert annotated[55, 30].tolist() != [0, 0, 0]
     assert annotated[10, 10].tolist() == [0, 0, 0]
-    assert annotated[10, 110].tolist() == [0, 0, 0]
+    assert annotated[110, 110].tolist() == [0, 0, 0]
 
 
 def test_annotation_leaves_image_untouched_without_weeds():

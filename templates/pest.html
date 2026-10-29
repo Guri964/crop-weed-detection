@@ -277,7 +277,7 @@
                 Module 1
             </span>
             <h1>Pest &amp; Stress Detection</h1>
-            <p>Upload a clear, close-up image of a plant leaf. Our MobileNetV2 model analyzes it in HSV color space to identify pest damage, disease, or nutrient stress.</p>
+            <p>Upload a clear, close-up image of a plant leaf. Our leaf analysis pipeline examines the image to identify pest damage, disease, or a healthy leaf.</p>
         </div>
 
         <div class="module-grid">
@@ -369,7 +369,7 @@
                 </div>
 
                 <div class="model-note">
-                    <strong>How it works:</strong> your image is converted from BGR to HSV colour space, then passed through a customized MobileNetV2 network trained on 38 PlantVillage classes covering 14 crop species (26 diseases plus healthy leaves). Predictions are only reported when the model is confident and stable; otherwise the result is marked inconclusive.
+                    <strong>How it works:</strong> your image is analysed against 14 supported crop species and their common leaf diseases. A result is only reported when the analysis is confident and stable; otherwise the result is marked inconclusive so no unsupported diagnosis is shown.
                 </div>
             </div>
         </div>
